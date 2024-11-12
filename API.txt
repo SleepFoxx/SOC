@@ -1,0 +1,34 @@
+SOČ
+DEXCOM API:
+	ZACIATOK:
+		Redirect URl, stranka kde bude cisto redirect na login skrz dexcom server kvoli tomu ze HIPPA a na protectovanie osobnych dat, dovod? jebly OAuth
+		Presmerovanie usera na login Dexcomu kde bude musiet zadat svoje udaje
+		Vrati sa HTTP 302 redirect naspat s tym ze tam pribudne authorization_code
+		Authorization_code sa musi poslat na dalsi https request z ktoreho sa vrati json file ktory bude obsahovat token na dalsie getovanie, cas kedy expiruje (2h), a refresh token
+	FUNGOVANIE:
+		Kazdych 5-6min sa bude posielat https request ktory bude getovat vsetky udaje ktore potrebujeme
+		Kazde 2h sa bude musiet getovat novy token skrz refresh token, ten sa meni vzdy s kazdym getom noveho tokenu, maximum 1 rok
+	POZNAMKY:
+		Treba spravit optimalne errory na: 
+			401 - stary access_token
+			400 - revoke od usera, reset hesla usera, expirovany, pouzity refresh_token
+			Najlepsie riesenie? Nova autorizacia usera
+	KNIZNICE: 
+		requests
+
+PyDexcom library:
+	ZACIATOK:
+		Vyziadanie mena/telefonu/mailu a hesla od usera, kedze ide o 3. stranu tak netreba riesit OAuth
+		Overenie funkcnosti prihlasenia, ak nefunguje znova vypytat
+	FUNGOVANIE: 
+		Kazdych 5-6min sa spusti jednoriadkovy kod ktory skrz prihlasovacie udaje getuje bud vsetko v jsone alebo samostatne do premennych
+	POZNAMKY:
+		Errory
+	KNIZNICE:
+		Samotna kniznica PyDexcom alebo ak vezmeme iba jej kod tak:
+			__future__, logging, re, datetime, typing, uuid, datetime/schedule/time (schedule najlepsia verzia)
+	
+		
+		
+	
+	
