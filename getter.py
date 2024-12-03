@@ -5,6 +5,13 @@ import time
 
 dexcom = Dexcom(username= "sleepfox", password= "Littlelam2", region="ous")
 
+def trying(username, password):
+    try:
+        dexcom = Dexcom(username= username, password= password, region="ous")
+        return True
+    except:
+        return False
+
 def zaznam():
     glucose_reading = dexcom.get_current_glucose_reading()
     print(glucose_reading.mmol_l)
