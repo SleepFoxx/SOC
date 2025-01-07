@@ -1,10 +1,13 @@
 import customtkinter as ctk
 from pydexcom import Dexcom
 import json
+import subprocess
+import sys
+import os
 
 app = ctk.CTk()
 app.title("PyDex Login")
-app.geometry("320x240")
+app.geometry("800x480")
 
 
 
@@ -23,13 +26,14 @@ def login():
             reading = get_reading.mmol_l
             print(reading)
             test = True
+            os.execv(sys.executable, ["python", "full.py", username, password])
+            
         else:
             test = False
     except:
         test = False
     if test:
-        status_label.configure(text=f"Login successful, {get_reading.mmol_l} mmol/L")
-        # runnovanie appky
+        pass
     else:
         status_label.configure(text="Login failed")
 

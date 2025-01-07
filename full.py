@@ -4,9 +4,11 @@ import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 from datetime import datetime, timedelta
 from pydexcom import Dexcom
+import sys
 
-username = "sleepfox"
-password = "Littlelam0412"
+username = sys.argv[1]
+password = sys.argv[2]
+
 dexcom = Dexcom(username=username, password=password, region="ous")
 
 app = ctk.CTk()
@@ -14,7 +16,8 @@ app.title("PyDex App")
 app.geometry("800x480")
 app.configure(bg="#000000")
 
-ctk.set_default_color_theme("blue")
+ctk.set_default_color_theme("black.json")
+
 
 frame_info = ctk.CTkFrame(master=app, width=800, height=150, corner_radius=15, fg_color="#000000")
 frame_info.pack(pady=20, padx=10, fill="x")
