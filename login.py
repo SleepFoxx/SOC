@@ -38,22 +38,24 @@ def login():
         status_label.configure(text="Login failed")
 
 
-frame = ctk.CTkFrame(master=app, width=300, height=200, corner_radius=15)
-frame.pack(pady=20, padx=10, fill="both", expand=True)
+frame = ctk.CTkFrame(master=app, width=780, height=460, corner_radius=15)
+frame.pack(pady=10, padx=10, fill="both", expand=True)
 
-login_label = ctk.CTkLabel(master=frame, text="Login", font=("Arial", 18))
-login_label.pack(pady=10)
+login_label = ctk.CTkLabel(master=frame, text="Login", font=("Arial", 24))
+login_label.pack(pady=30)
 
-username_entry = ctk.CTkEntry(master=frame, placeholder_text="Username")
-username_entry.pack(pady=5, padx=10)
+username_entry = ctk.CTkEntry(master=frame, placeholder_text="Username", font=("Arial", 18), height=40, width=300)
+username_entry.pack(pady=15, padx=20)
 
-password_entry = ctk.CTkEntry(master=frame, placeholder_text="Password", show="*")
-password_entry.pack(pady=5, padx=10)
+password_entry = ctk.CTkEntry(master=frame, placeholder_text="Password", show="*", font=("Arial", 18), height=40, width=300)
+password_entry.pack(pady=15, padx=20)
 
-login_button = ctk.CTkButton(master=frame, text="Login", command=login)
-login_button.pack(pady=10)
+login_button = ctk.CTkButton(master=frame, text="Login", command=login, font=("Arial", 18), width=300, height=40)
+login_button.pack(pady=20)
 
-status_label = ctk.CTkLabel(master=frame, text="", font=("Arial", 10))
-status_label.pack(pady=5)
+status_label = ctk.CTkLabel(master=frame, text="", font=("Arial", 14))
+status_label.pack(pady=10)
+
+app.mainloop()
 
 app.mainloop()

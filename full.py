@@ -39,7 +39,7 @@ ax.set_ylim(3.5, 22.2)
 sc = ax.scatter([], [], color='b', marker='o', picker=True)
 
 ax.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))
-ax.xaxis.set_major_locator(mdates.HourLocator(interval=1))
+#ax.xaxis.set_major_locator(mdates.HourLocator(interval=1))
 ax.xaxis.set_minor_locator(mdates.MinuteLocator(interval=30))
 
 canvas = FigureCanvasTkAgg(fig, master=frame_graph)
