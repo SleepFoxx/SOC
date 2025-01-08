@@ -88,13 +88,30 @@ username_entry.pack(pady=15, padx=20)
 password_entry = ctk.CTkEntry(master=frame, placeholder_text="Password", show="*", font=("Arial", 18), height=40, width=300)
 password_entry.pack(pady=15, padx=20)
 
+
+
 login_button = ctk.CTkButton(master=frame, text="Login", command=login, font=("Arial", 18), width=300, height=40)
 login_button.pack(pady=20)
 
 status_label = ctk.CTkLabel(master=frame, text="", font=("Arial", 14))
 status_label.pack(pady=10)
 
+conn = sqlite3.connect("test.db")
+cursor = conn.cursor()
 
+for data in cursor.execute("SELECT username FROM users"):
+    username = data[0]
+    cursor.execute("SELECT password FROM users WHERE username = ?", (username,)) 
+    stored_password = cursor.fetchone()[0]
+    def quick_login(username, stored_password):
+        os.execv(sys.executable, ["python", "full.py", username, stored_password])
+    
+    
+    quick_login_button = ctk.CTkButton(master=frame, text=username, command=lambda username=username, stored_password=stored_password: quick_login(username, stored_password), font=("Arial", 14), width=280, height=40)
+    quick_login_button.pack(pady=5, padx=20)
+
+conn.commit()
+conn.close()
 
 
 
