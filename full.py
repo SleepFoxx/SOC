@@ -5,6 +5,7 @@ import matplotlib.dates as mdates
 from datetime import datetime, timedelta
 from pydexcom import Dexcom
 import sys
+#import pygame  # Pre prehravanie mp3
 
 username = sys.argv[1]
 password = sys.argv[2]
@@ -18,7 +19,6 @@ app.configure(bg="#000000")
 
 ctk.set_default_color_theme("black.json")
 
-
 frame_info = ctk.CTkFrame(master=app, width=800, height=150, corner_radius=15, fg_color="#000000")
 frame_info.pack(pady=20, padx=10, fill="x")
 
@@ -27,6 +27,9 @@ glucose_label.place(relx=0.5, rely=0.4, anchor="center")
 
 arrow_label = ctk.CTkLabel(master=frame_info, text="", font=("Comic-sans", 25), fg_color="#000000", text_color="white")
 arrow_label.place(relx=0.5, rely=0.7, anchor="center")
+
+mute_button = None
+mute_until = None
 
 frame_graph = ctk.CTkFrame(master=app, corner_radius=15, fg_color="#000000")
 frame_graph.pack(pady=20, padx=10, fill="both", expand=True)
@@ -39,7 +42,6 @@ ax.set_ylim(3.5, 22.2)
 sc = ax.scatter([], [], color='b', marker='o', picker=True)
 
 ax.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))
-#ax.xaxis.set_major_locator(mdates.HourLocator(interval=1))
 ax.xaxis.set_minor_locator(mdates.MinuteLocator(interval=30))
 
 canvas = FigureCanvasTkAgg(fig, master=frame_graph)
@@ -48,10 +50,41 @@ canvas.get_tk_widget().pack(fill="both", expand=True)
 times = []
 values = []
 
+def mute_alert():
+    global mute_until, mute_button
+    mute_until = datetime.now() + timedelta(minutes=30)
+    if mute_button:
+        mute_button.pack_forget()
+    # pygame.mixer.stop()  # Zastavi prehravanie mp3
+
+def show_mute_button():
+    global mute_button
+    if not mute_button:
+        mute_button = ctk.CTkButton(master=app, text="Stíšiť", command=mute_alert)
+    mute_button.pack(pady=10, padx=10, anchor="nw")
+
 def update_glucose():
+    global mute_until
     try:
         glucose_reading = dexcom.get_current_glucose_reading()
         glucose_value = round(glucose_reading.mmol_l, 1)
+
+        if glucose_value > 12.0:
+            glucose_label.configure(text_color="yellow")
+            if not mute_until or datetime.now() > mute_until:
+                show_mute_button()
+                # pygame.mixer.init()
+                # pygame.mixer.music.load("high_alert.mp3")
+                # pygame.mixer.music.play()
+        elif glucose_value < 4.0:
+            glucose_label.configure(text_color="red")
+            if not mute_until or datetime.now() > mute_until:
+                show_mute_button()
+                # pygame.mixer.init()
+                # pygame.mixer.music.load("low_alert.mp3")
+                # pygame.mixer.music.play()
+        else:
+            glucose_label.configure(text_color="white")
 
         glucose_label.configure(text=f"{glucose_value} mmol/L")
         arrow_label.configure(text=glucose_reading.trend_arrow)
@@ -67,11 +100,10 @@ def update_glucose():
         sc.set_offsets(list(zip(mdates.date2num(times), values)))
         ax.set_xlim([times[-1] - timedelta(hours=3), times[-1] + timedelta(minutes=10)])
         fig.canvas.draw_idle()
-
     except Exception as e:
         glucose_label.configure(text="Chyba")
         arrow_label.configure(text=str(e))
-
+    
     app.after(300000, update_glucose)
 
 def on_pick(event):
