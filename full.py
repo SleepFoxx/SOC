@@ -29,14 +29,14 @@ glucose_label.place(relx=0.5, rely=0.4, anchor="center")
 arrow_label = ctk.CTkLabel(master=frame_info, text="", font=("Comic-sans", 25), fg_color="#000000", text_color="white")
 arrow_label.place(relx=0.5, rely=0.7, anchor="center")
 
-image = Image.open("straight_white_small.png")
-photo = ImageTk.PhotoImage(image)
+#image = Image.open("straight_white_small.png")
+#photo = ImageTk.PhotoImage(image)
 
-image_label = ctk.CTkLabel(master=frame_info, image=photo, text="", compound="center", font=("Comic-sans", 23), fg_color="#000000", text_color="white")
-image_label.place(x=330, y=40)
+#image_label = ctk.CTkLabel(master=frame_info, image=photo, text="", compound="center", font=("Comic-sans", 23), fg_color="#000000", text_color="white")
+#image_label.place(x=330, y=40)
 
-unit_label = ctk.CTkLabel(master=frame_info, text="mmol/L", font=("Comic-sans", 7), fg_color="#000000", text_color="white")
-unit_label.place(x=350, y=70)
+#unit_label = ctk.CTkLabel(master=frame_info, text="mmol/L", font=("Comic-sans", 7), fg_color="#000000", text_color="white")
+#unit_label.place(x=350, y=70)
 
 mute_button = None
 mute_until = None
@@ -89,6 +89,7 @@ def update_glucose(initial=False):
 
         if glucose_value > 12.0:
             glucose_label.configure(text_color="yellow")
+            #image_label.configure(text_color="yellow")
             if not mute_until or datetime.now() > mute_until or initial:
                 show_mute_button()
                 #pygame.mixer.init()
@@ -97,14 +98,16 @@ def update_glucose(initial=False):
                 mute_button.lift()
         elif glucose_value < 4.0:
             glucose_label.configure(text_color="red")
+            #image_label.configure(text_color="red")
             if not mute_until or datetime.now() > mute_until or initial:
                 show_mute_button()
                 mute_button.lift()
         else:
             glucose_label.configure(text_color="white")
+            #image_label.configure(text_color="red")
 
         glucose_label.configure(text=f"{glucose_value}")
-        image_label.configure(text = f"{glucose_value}")
+        #image_label.configure(text = f"{glucose_value}")
         arrow_label.configure(text=glucose_reading.trend_arrow)
 
         values.append(glucose_value)
@@ -141,13 +144,16 @@ def on_pick(event):
 
         original_glucose = glucose_label.cget("text")
         original_arrow = arrow_label.cget("text")
+        
 
         glucose_label.configure(text=f"{value_clicked} mmol/L")
         arrow_label.configure(text=f"Kliknuté: {time_clicked}")
+        #image_label.configure(image=None)
 
         def restore_original_text():
             glucose_label.configure(text=original_glucose)
             arrow_label.configure(text=original_arrow)
+            #image_label.configure(image=photo)
 
         app.after(10000, restore_original_text)
 
