@@ -5,6 +5,7 @@ import matplotlib.dates as mdates
 from datetime import datetime, timedelta
 from pydexcom import Dexcom
 import sys
+from PIL import Image, ImageTk
 #import pygame  
 
 username = sys.argv[1]
@@ -27,6 +28,15 @@ glucose_label.place(relx=0.5, rely=0.4, anchor="center")
 
 arrow_label = ctk.CTkLabel(master=frame_info, text="", font=("Comic-sans", 25), fg_color="#000000", text_color="white")
 arrow_label.place(relx=0.5, rely=0.7, anchor="center")
+
+image = Image.open("straight_white_small.png")
+photo = ImageTk.PhotoImage(image)
+
+image_label = ctk.CTkLabel(master=frame_info, image=photo, text="", compound="center", font=("Comic-sans", 23), fg_color="#000000", text_color="white")
+image_label.place(x=330, y=40)
+
+unit_label = ctk.CTkLabel(master=frame_info, text="mmol/L", font=("Comic-sans", 7), fg_color="#000000", text_color="white")
+unit_label.place(x=350, y=70)
 
 mute_button = None
 mute_until = None
@@ -93,7 +103,8 @@ def update_glucose(initial=False):
         else:
             glucose_label.configure(text_color="white")
 
-        glucose_label.configure(text=f"{glucose_value} mmol/L")
+        glucose_label.configure(text=f"{glucose_value}")
+        image_label.configure(text = f"{glucose_value}")
         arrow_label.configure(text=glucose_reading.trend_arrow)
 
         values.append(glucose_value)
