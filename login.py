@@ -8,6 +8,7 @@ from Crypto.Cipher import AES
 from Crypto.Random import get_random_bytes
 
 
+
 def init_db():
     conn = sqlite3.connect("test.db")
     cursor = conn.cursor()
@@ -62,7 +63,7 @@ def save_user(username, password):
     return True
 
 
-ctk.set_default_color_theme("blue")
+
 
 def login():
     username = username_entry.get()
@@ -102,6 +103,7 @@ generate_key()
 
 app = ctk.CTk()
 app.title("PyDex Login")
+ctk.set_default_color_theme("blue")
 app.geometry("800x480")
 
 frame = ctk.CTkFrame(master=app, width=780, height=460, corner_radius=15)

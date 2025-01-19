@@ -5,7 +5,7 @@ import matplotlib.dates as mdates
 from datetime import datetime, timedelta
 from pydexcom import Dexcom
 import sys
-#import pygame  # Pre prehravanie mp3
+#import pygame  
 
 username = sys.argv[1]
 password = sys.argv[2]
@@ -19,8 +19,8 @@ app.configure(bg="#000000")
 
 ctk.set_default_color_theme("black.json")
 
-frame_info = ctk.CTkFrame(master=app, width=800, height=150, corner_radius=15, fg_color="#000000")
-frame_info.pack(pady=20, padx=10, fill="x")
+frame_info = ctk.CTkFrame(master=app, width=800, height=160, corner_radius=5, fg_color="#000000")
+frame_info.pack(pady=0, padx=0, fill="x")
 
 glucose_label = ctk.CTkLabel(master=frame_info, text="", font=("Comic-sans", 25), fg_color="#000000", text_color="white")
 glucose_label.place(relx=0.5, rely=0.4, anchor="center")
@@ -31,18 +31,24 @@ arrow_label.place(relx=0.5, rely=0.7, anchor="center")
 mute_button = None
 mute_until = None
 
-frame_graph = ctk.CTkFrame(master=app, corner_radius=15, fg_color="#000000")
-frame_graph.pack(pady=20, padx=10, fill="both", expand=True)
+frame_graph = ctk.CTkFrame(master=app, corner_radius=1, fg_color="#000000")
+frame_graph.pack(pady=0, padx=0, fill="both", expand=True)
 
 plt.style.use('dark_background')
 fig, ax = plt.subplots(figsize=(8, 4))
+fig.subplots_adjust(bottom=0.2)  
+
 ax.set_xlabel('Čas', fontsize=10, color="white")
 ax.set_ylabel('Glukóza (mmol/L)', fontsize=10, color="white")
-ax.set_ylim(3.5, 22.2)
-sc = ax.scatter([], [], color='b', marker='o', picker=True)
+ax.set_ylim(2.2, 22.2)
+sc = ax.scatter([], [], color='white', marker='o', picker=True)
+
 
 ax.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))
 ax.xaxis.set_minor_locator(mdates.MinuteLocator(interval=30))
+
+ax.axhline(y=4.0, color='red', linestyle='--', linewidth=1, label="Dolná hranica (4 mmol/L)")
+ax.axhline(y=12.0, color='yellow', linestyle='--', linewidth=1, label="Horná hranica (12 mmol/L)")
 
 canvas = FigureCanvasTkAgg(fig, master=frame_graph)
 canvas.get_tk_widget().pack(fill="both", expand=True)
@@ -51,19 +57,21 @@ times = []
 values = []
 
 def mute_alert():
-    global mute_until, mute_button
+    global mute_until, mute_button, mute_until_start
     mute_until = datetime.now() + timedelta(minutes=30)
     if mute_button:
-        mute_button.pack_forget()
-    # pygame.mixer.stop()  # Zastavi prehravanie mp3
+        mute_button.place_forget()
+    # pygame.mixer.stop()  
 
 def show_mute_button():
     global mute_button
     if not mute_button:
         mute_button = ctk.CTkButton(master=app, text="Stíšiť", command=mute_alert)
-    mute_button.pack(pady=10, padx=10, anchor="nw")
+        mute_button.place(x=10, y=10)  
+        mute_button.lift()  
 
-def update_glucose():
+
+def update_glucose(initial=False):
     global mute_until
     try:
         glucose_reading = dexcom.get_current_glucose_reading()
@@ -71,18 +79,17 @@ def update_glucose():
 
         if glucose_value > 12.0:
             glucose_label.configure(text_color="yellow")
-            if not mute_until or datetime.now() > mute_until:
+            if not mute_until or datetime.now() > mute_until or initial:
                 show_mute_button()
-                # pygame.mixer.init()
-                # pygame.mixer.music.load("high_alert.mp3")
-                # pygame.mixer.music.play()
+                #pygame.mixer.init()
+                #pygame.mixer.music.load("alarm.mp3")
+                #pygame.mixer.music.play()
+                mute_button.lift()
         elif glucose_value < 4.0:
             glucose_label.configure(text_color="red")
-            if not mute_until or datetime.now() > mute_until:
+            if not mute_until or datetime.now() > mute_until or initial:
                 show_mute_button()
-                # pygame.mixer.init()
-                # pygame.mixer.music.load("low_alert.mp3")
-                # pygame.mixer.music.play()
+                mute_button.lift()
         else:
             glucose_label.configure(text_color="white")
 
@@ -93,18 +100,26 @@ def update_glucose():
         current_time = datetime.now()
         times.append(current_time)
 
-        if len(times) > 400:
+        if len(times) > 36:
             times.pop(0)
             values.pop(0)
 
+        colors = ['yellow' if v > 12.0 else 'red' if v < 4.0 else 'white' for v in values]
+        
         sc.set_offsets(list(zip(mdates.date2num(times), values)))
+        sc.set_color(colors)
+
         ax.set_xlim([times[-1] - timedelta(hours=3), times[-1] + timedelta(minutes=10)])
         fig.canvas.draw_idle()
     except Exception as e:
         glucose_label.configure(text="Chyba")
         arrow_label.configure(text=str(e))
     
-    app.after(300000, update_glucose)
+    if not initial:
+        app.after(300000, update_glucose)
+
+
+
 
 def on_pick(event):
     ind = event.ind
@@ -125,11 +140,17 @@ def on_pick(event):
 
         app.after(10000, restore_original_text)
 
+def on_closing():
+    app.quit()  
+    app.destroy()  
+app.protocol("WM_DELETE_WINDOW", on_closing)
+
+
 fig.canvas.mpl_connect('pick_event', on_pick)
 
 info_label = ctk.CTkLabel(master=app, text="Kliknite na bod na grafe", font=("Comic-sans", 15), fg_color="#000000", text_color="white")
 info_label.pack()
 
-update_glucose()
+update_glucose(initial=True)
 
 app.mainloop()
