@@ -2,7 +2,7 @@ import requests
 from datetime import datetime, timedelta
 
 
-def scraper():
+def scrape():
     base_url = "https://site--nightscout--m9xqnnmsqrfs.code.run/api/v1/entries"
 
     params = {
@@ -41,4 +41,4 @@ def scraper():
     else:
         print(f"Request failed with status code {response.status_code}")
         print("Response text:", response.text)
-scraper()
+scrape()
