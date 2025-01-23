@@ -7,6 +7,9 @@ from pydexcom import Dexcom
 import sys
 from PIL import Image, ImageTk
 from scraper import *
+import pygame
+
+
 
 username = sys.argv[1]
 password = sys.argv[2]
@@ -64,11 +67,15 @@ def mute_alert():
     global mute_until, mute_button
     mute_until = datetime.now() + timedelta(minutes=30)
     if mute_button:
+        pygame.mixer.music.stop()
         mute_button.place_forget()
+        pygame.mixer.music.unload()
 
 def show_mute_button():
     global mute_button
     if not mute_button:
+        pygame.mixer.init()
+        pygame.mixer.music.play()
         mute_button = ctk.CTkButton(master=app, text="Stíšiť", command=mute_alert)
         mute_button.place(x=10, y=10)  
         mute_button.lift()  
@@ -83,6 +90,8 @@ def update_glucose():
             glucose_label.configure(text_color="yellow")
             image_label.configure(text_color="yellow")
             if not mute_until or datetime.now() > mute_until:
+                pygame.mixer.init()
+                pygame.mixer.music.load("high_alert.mp3")
                 show_mute_button()
         elif glucose_value < 4.0:
             glucose_label.configure(text_color="red")
@@ -108,9 +117,13 @@ def update_glucose():
             photo = ImageTk.PhotoImage(image)
             image_label.configure(image = photo)
         elif(glucose_reading.trend_arrow == "↗"):
-            pass
+            image = Image.open("up_right_white_small.png")
+            photo = ImageTk.PhotoImage(image)
+            image_label.configure(image = photo)
         elif(glucose_reading.trend_arrow == "↘"):
-            pass
+            image = Image.open("down_right_white_small.png")
+            photo = ImageTk.PhotoImage(image)
+            image_label.configure(image = photo)
 
         values.append(glucose_value)
         current_time = datetime.now()
