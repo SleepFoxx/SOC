@@ -11,6 +11,7 @@ import pygame
 
 
 
+
 username = sys.argv[1]
 password = sys.argv[2]
 
@@ -76,7 +77,7 @@ def show_mute_button():
     if not mute_button:
         pygame.mixer.init()
         pygame.mixer.music.play()
-        mute_button = ctk.CTkButton(master=app, text="Stíšiť", command=mute_alert)
+        mute_button = ctk.CTkButton(master=app, text="Stíšiť", command=mute_alert, border_width=2, border_color="grey")
         mute_button.place(x=10, y=10)  
         mute_button.lift()  
 

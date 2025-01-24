@@ -34,8 +34,6 @@ def scrape():
                 time_values.append(time_part)
                 sgv_values.append(sgv_mmol)
         
-        print("Time values:", time_values)
-        print("SGV values:", sgv_values)
         return time_values, sgv_values
 
     else:
