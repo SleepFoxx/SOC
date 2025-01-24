@@ -98,6 +98,9 @@ def update_glucose():
             glucose_label.configure(text_color="red")
             image_label.configure(text_color="red")
             if not mute_until or datetime.now() > mute_until:
+                pygame.mixer.init()
+                pygame.mixer.music.load("low_alert.mp3")
+                show_mute_button()
                 show_mute_button()
         else:
             glucose_label.configure(text_color="white")
