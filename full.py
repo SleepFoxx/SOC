@@ -156,19 +156,17 @@ def on_pick(event):
         time_clicked = times[i]
         value_clicked = values[i]
 
-        original_glucose = glucose_label.cget("text")
-        original_arrow = arrow_label.cget("text")
         
         glucose_label.configure(text=f"{value_clicked} mmol/L")
         arrow_label.configure(text=f"Kliknuté: {time_clicked}")
         image_label.place_forget()
 
         def restore_original_text():
-            glucose_label.configure(text=original_glucose)
-            arrow_label.configure(text=original_arrow)
+            glucose_label.configure(text="")
+            arrow_label.configure(text="")
             image_label.place(x=330, y=40)
 
-        app.after(10000, restore_original_text)
+        app.after(5000, restore_original_text)
 
 def on_closing():
     app.quit()  
