@@ -22,16 +22,13 @@ app.title("PyDex App")
 app.geometry("800x480")
 app.configure(bg="#000000")
 
-ctk.set_default_color_theme("black.json")
+ctk.set_default_color_theme("sources/themes/black.json")
 
 frame_info = ctk.CTkFrame(master=app, width=800, height=160, corner_radius=5, fg_color="#000000")
 frame_info.pack(pady=0, padx=0, fill="x")
 
 glucose_label = ctk.CTkLabel(master=frame_info, text="", font=("Comic-sans", 25), fg_color="#000000", text_color="white")
-glucose_label.place(relx=0.5, rely=0.4, anchor="center")
-
 arrow_label = ctk.CTkLabel(master=frame_info, text="", font=("Comic-sans", 25), fg_color="#000000", text_color="white")
-arrow_label.place(relx=0.5, rely=0.7, anchor="center")
 
 image_label = ctk.CTkLabel(master=frame_info, image="", text="", compound="center", font=("Comic-sans", 23), fg_color="#000000", text_color="white")
 image_label.place(x=330, y=40)
@@ -47,7 +44,7 @@ fig, ax = plt.subplots(figsize=(8, 4))
 fig.subplots_adjust(bottom=0.2)  
 
 ax.set_xlabel('Čas', fontsize=10, color="white")
-ax.set_ylabel('Glukóza (mmol/L)', fontsize=10, color="white")
+ax.set_ylabel('Glykémia (mmol/L)', fontsize=10, color="white")
 ax.set_ylim(2.2, 22.2)
 sc = ax.scatter([], [], color='white', marker='o', picker=True)
 
@@ -81,7 +78,7 @@ def show_mute_button():
         mute_button.place(x=10, y=10)  
         mute_button.lift()  
 
-def update_glucose():
+def update_glucose(on_clicking=False):
     global mute_until
     try:
         glucose_reading = dexcom.get_current_glucose_reading()
@@ -92,14 +89,14 @@ def update_glucose():
             image_label.configure(text_color="yellow")
             if not mute_until or datetime.now() > mute_until:
                 pygame.mixer.init()
-                pygame.mixer.music.load("high_alert.mp3")
+                pygame.mixer.music.load("sources/sounds/high_alert.mp3")
                 show_mute_button()
         elif glucose_value < 4.0:
             glucose_label.configure(text_color="red")
             image_label.configure(text_color="red")
             if not mute_until or datetime.now() > mute_until:
                 pygame.mixer.init()
-                pygame.mixer.music.load("low_alert.mp3")
+                pygame.mixer.music.load("sources/sounds/low_alert.mp3")
                 show_mute_button()
                 show_mute_button()
         else:
@@ -109,49 +106,54 @@ def update_glucose():
         glucose_label.configure(text=f"{glucose_value}")
         image_label.configure(text = f"{glucose_value}")
         if(glucose_reading.trend_arrow == "→"):
-            image = Image.open("straight_white_small.png")
+            image = Image.open("sources/images/straight_white_small.png")
             photo = ImageTk.PhotoImage(image)
+            image_label.place(x=320, y=40)
             image_label.configure(image = photo)
         elif(glucose_reading.trend_arrow == "↑"):
-            image = Image.open("up_white_small.png")
+            image = Image.open("sources/images/up_white_small.png")
             photo = ImageTk.PhotoImage(image)
+            image_label.place(x=330, y=10)
             image_label.configure(image = photo)
         elif(glucose_reading.trend_arrow == "↓"):
-            image = Image.open("down_white_small.png")
+            image = Image.open("sources/images/down_white_small.png")
             photo = ImageTk.PhotoImage(image)
+            image_label.place(x=340, y=-5)
             image_label.configure(image = photo)
         elif(glucose_reading.trend_arrow == "↗"):
-            image = Image.open("up_right_white_small.png")
+            image = Image.open("sources/images/up_right_white_small.png")
             photo = ImageTk.PhotoImage(image)
+            image_label.place(x=315, y=30)
             image_label.configure(image = photo)
         elif(glucose_reading.trend_arrow == "↘"):
-            image = Image.open("down_right_white_small.png")
+            image = Image.open("sources/images/down_right_white_small.png")
             photo = ImageTk.PhotoImage(image)
+            image_label.place(x=320, y=25)
             image_label.configure(image = photo)
+        if(on_clicking == False):
+            values.append(glucose_value)
+            current_time = datetime.now()
+            formated_time = current_time.strftime('%H:%M')  
+            times.append(formated_time)
 
-        values.append(glucose_value)
-        current_time = datetime.now()
-        formated_time = current_time.strftime('%H:%M')  
-        times.append(formated_time)
+            if len(times) > 36:
+                times.pop(0)
+                values.pop(0)
 
-        if len(times) > 36:
-            times.pop(0)
-            values.pop(0)
+            time_objects = [datetime.strptime(t, '%H:%M') for t in times]
 
-        time_objects = [datetime.strptime(t, '%H:%M') for t in times]
+            colors = ['yellow' if v > 12.0 else 'red' if v < 4.0 else 'white' for v in values]
 
-        colors = ['yellow' if v > 12.0 else 'red' if v < 4.0 else 'white' for v in values]
+            sc.set_offsets(list(zip(mdates.date2num(time_objects), values)))
+            sc.set_color(colors)
 
-        sc.set_offsets(list(zip(mdates.date2num(time_objects), values)))
-        sc.set_color(colors)
-
-        ax.set_xlim([time_objects[-1] - timedelta(hours=3), time_objects[-1] + timedelta(minutes=10)])
-        fig.canvas.draw_idle()
+            ax.set_xlim([time_objects[-1] - timedelta(hours=3), time_objects[-1] + timedelta(minutes=10)])
+            fig.canvas.draw_idle()
     except Exception as e:
         glucose_label.configure(text="Chyba")
         arrow_label.configure(text=str(e))
-
-    app.after(300000, update_glucose)  
+    if(on_clicking == False):
+        app.after(300000, update_glucose)  
 
 def on_pick(event):
     ind = event.ind
@@ -160,15 +162,23 @@ def on_pick(event):
         time_clicked = times[i]
         value_clicked = values[i]
 
-        
+        glucose_label.place(relx=0.5, rely=0.4, anchor="center")
         glucose_label.configure(text=f"{value_clicked} mmol/L")
+
+        arrow_label.place(relx=0.5, rely=0.7, anchor="center")
         arrow_label.configure(text=f"Kliknuté: {time_clicked}")
+
         image_label.place_forget()
 
         def restore_original_text():
             glucose_label.configure(text="")
+            glucose_label.place_forget()
+
             arrow_label.configure(text="")
+            arrow_label.place_forget()
+            
             image_label.place(x=330, y=40)
+            update_glucose(on_clicking=True)
 
         app.after(5000, restore_original_text)
 
