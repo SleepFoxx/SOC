@@ -8,6 +8,7 @@ import sys
 from PIL import Image, ImageTk
 from scraper import *
 import pygame
+import os
 
 
 
@@ -35,6 +36,8 @@ image_label.place(x=330, y=40)
 
 mute_button = None
 mute_until = None
+
+
 
 frame_graph = ctk.CTkFrame(master=app, corner_radius=1, fg_color="#000000")
 frame_graph.pack(pady=0, padx=0, fill="both", expand=True)
@@ -181,6 +184,16 @@ def on_pick(event):
             update_glucose(on_clicking=True)
 
         app.after(5000, restore_original_text)
+
+def shutdown_system():
+    os.system("sudo shutdown now")
+
+power_icon = Image.open("sources/images/power_button.png")
+power_icon = power_icon.resize((40, 40))
+power_photo = ImageTk.PhotoImage(power_icon)
+
+power_button = ctk.CTkButton(master=app, text = "", image=power_photo, command=shutdown_system, fg_color="black", hover_color="black", border_width=0, corner_radius=0, width=40, height=40)
+power_button.place(x=700, y=10)
 
 def on_closing():
     app.quit()  
