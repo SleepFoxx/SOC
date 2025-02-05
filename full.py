@@ -19,7 +19,7 @@ password = sys.argv[2]
 dexcom = Dexcom(username=username, password=password, region="ous")
 
 app = ctk.CTk()
-app.title("PyDex App")
+app.title("PyDexcom")
 app.geometry("800x480")
 app.configure(bg="#000000")
 

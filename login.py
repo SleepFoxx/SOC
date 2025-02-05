@@ -102,7 +102,7 @@ init_db()
 generate_key()
 
 app = ctk.CTk()
-app.title("PyDex Login")
+app.title("Login")
 ctk.set_default_color_theme("blue")
 app.geometry("800x480")
 
