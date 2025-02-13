@@ -84,7 +84,7 @@ def show_mute_button():
         mute_button.place(x=10, y=10)  
         mute_button.lift()  
 
-def update_glucose(on_clicking=False):
+def update_glucose(on_clicking=False, first = False):
     global mute_until
     try:
         glucose_reading = dexcom.get_current_glucose_reading()
@@ -148,20 +148,28 @@ def update_glucose(on_clicking=False):
             formated_time = current_time.strftime('%H:%M')  
             times.append(formated_time)
 
+            if(first == False):
+                for i in range (27, 37):
+                    times.pop(i)
+                    values.pop(i)
+
             predictions, predictions_downward, predicted_times = generate_predictions(5)
 
             predicted_times_objects = [datetime.strptime(t, '%H:%M') for t in predicted_times]
             time_objects = [datetime.strptime(t, '%H:%M') for t in times]
 
             for i in range(len(predictions)):
-                values.append(predictions[i])
-                values.append(predictions_downward[i])
+                values.append( predictions[i])
+                values.append( predictions_downward[i])
                 times.append(predicted_times[i])
                 times.append(predicted_times[i])
             
             if len(times) > 36:
                 times.pop(0)
                 values.pop(0)
+            print(values)
+            print(times)
+            
 
             colors = []
             for i in range(len(values)):
@@ -177,7 +185,7 @@ def update_glucose(on_clicking=False):
             sc.set_offsets(list(zip(mdates.date2num(time_objects + predicted_times_objects), values)))
             sc.set_color(colors)
 
-            ax.set_xlim([time_objects[-1] - timedelta(hours=3), time_objects[-1] + timedelta(minutes=10)])
+            ax.set_xlim([time_objects[-1] - timedelta(hours=3), time_objects[-1] + timedelta(minutes=25)])
             fig.canvas.draw_idle()
     except Exception as e:
         glucose_label.configure(text="Chyba")
@@ -196,6 +204,12 @@ def on_pick(event):
         glucose_label.configure(text=f"{value_clicked} mmol/L")
 
         arrow_label.place(relx=0.5, rely=0.7, anchor="center")
+        if value_clicked > 12.0:
+            glucose_label.configure(text_color="yellow")
+        elif value_clicked < 4.0:
+            glucose_label.configure(text_color="red")
+        else:
+            glucose_label.configure(text_color="white")
         arrow_label.configure(text=f"Kliknuté: {time_clicked}")
 
         image_label.place_forget()
@@ -232,6 +246,6 @@ fig.canvas.mpl_connect('pick_event', on_pick)
 info_label = ctk.CTkLabel(master=app, text="Kliknite na bod na grafe", font=("Comic-sans", 15), fg_color="#000000", text_color="white")
 info_label.pack()
 
-update_glucose()
+update_glucose(first = True)
 
 app.mainloop()

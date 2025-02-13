@@ -52,9 +52,9 @@ def scrape():
                 time_part = datetime_obj.strftime('%H:%M')
                 sgv_mmol = round(int(sgv_value) * 0.05551, 1)
                 
-                time_values.append(time_part)
-                sgv_values.append(sgv_mmol)
-                arrow_values.append(arrow_value)
+                time_values.insert(0, time_part)
+                sgv_values.insert(0, sgv_mmol)
+                arrow_values.insert(0, arrow_value)
         
         return time_values, sgv_values, arrow_values
 
