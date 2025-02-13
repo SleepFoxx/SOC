@@ -7,8 +7,10 @@ from pydexcom import Dexcom
 import sys
 from PIL import Image, ImageTk
 from scraper import *
+from prediction import generate_predictions
 import pygame
 import os
+from collections import deque
 
 
 
@@ -62,7 +64,8 @@ canvas.get_tk_widget().pack(fill="both", expand=True)
 
 times = []
 values = []
-times, values = scrape()
+arrows = []
+times, values, arrows = scrape()
 
 def mute_alert():
     global mute_until, mute_button
@@ -108,46 +111,70 @@ def update_glucose(on_clicking=False):
 
         glucose_label.configure(text=f"{glucose_value}")
         image_label.configure(text = f"{glucose_value}")
-        if(glucose_reading.trend_arrow == "→"):
-            image = Image.open("sources/images/straight_white_small.png")
-            photo = ImageTk.PhotoImage(image)
-            image_label.place(x=320, y=40)
-            image_label.configure(image = photo)
-        elif(glucose_reading.trend_arrow == "↑"):
-            image = Image.open("sources/images/up_white_small.png")
-            photo = ImageTk.PhotoImage(image)
-            image_label.place(x=330, y=10)
-            image_label.configure(image = photo)
-        elif(glucose_reading.trend_arrow == "↓"):
-            image = Image.open("sources/images/down_white_small.png")
-            photo = ImageTk.PhotoImage(image)
-            image_label.place(x=340, y=-5)
-            image_label.configure(image = photo)
-        elif(glucose_reading.trend_arrow == "↗"):
-            image = Image.open("sources/images/up_right_white_small.png")
-            photo = ImageTk.PhotoImage(image)
-            image_label.place(x=315, y=30)
-            image_label.configure(image = photo)
-        elif(glucose_reading.trend_arrow == "↘"):
-            image = Image.open("sources/images/down_right_white_small.png")
-            photo = ImageTk.PhotoImage(image)
-            image_label.place(x=320, y=25)
-            image_label.configure(image = photo)
-        if(on_clicking == False):
+        match glucose_reading.trend_arrow:
+            case "→":
+                image = Image.open("sources/images/straight_white_small.png")
+                photo = ImageTk.PhotoImage(image)
+                image_label.place(x=320, y=40)
+                image_label.configure(image = photo)
+            case "↑":
+                image = Image.open("sources/images/up_white_small.png")
+                photo = ImageTk.PhotoImage(image)
+                image_label.place(x=330, y=10)
+                image_label.configure(image = photo)
+            case "↓":
+                image = Image.open("sources/images/down_white_small.png")
+                photo = ImageTk.PhotoImage(image)
+                image_label.place(x=340, y=-5)
+                image_label.configure(image = photo)
+            case "↗":
+                image = Image.open("sources/images/up_right_white_small.png")
+                photo = ImageTk.PhotoImage(image)
+                image_label.place(x=315, y=30)
+                image_label.configure(image = photo)
+            case "↘":
+                image = Image.open("sources/images/down_right_white_small.png")
+                photo = ImageTk.PhotoImage(image)
+                image_label.place(x=320, y=25)
+                image_label.configure(image = photo)
+            case _:
+                image = Image.open("sources/images/straight_white_small.png")
+                photo = ImageTk.PhotoImage(image)
+                image_label.place(x=320, y=40)
+                image_label.configure(image = photo)
+        if on_clicking == False:
             values.append(glucose_value)
             current_time = datetime.now()
             formated_time = current_time.strftime('%H:%M')  
             times.append(formated_time)
 
+            predictions, predictions_downward, predicted_times = generate_predictions(5)
+
+            predicted_times_objects = [datetime.strptime(t, '%H:%M') for t in predicted_times]
+            time_objects = [datetime.strptime(t, '%H:%M') for t in times]
+
+            for i in range(len(predictions)):
+                values.append(predictions[i])
+                values.append(predictions_downward[i])
+                times.append(predicted_times[i])
+                times.append(predicted_times[i])
+            
             if len(times) > 36:
                 times.pop(0)
                 values.pop(0)
 
-            time_objects = [datetime.strptime(t, '%H:%M') for t in times]
+            colors = []
+            for i in range(len(values)):
+                if i >= len(values) - 2 * len(predicted_times):
+                    colors.append('blue')
+                elif values[i] > 12.0:
+                    colors.append('yellow')
+                elif values[i] < 4.0:
+                    colors.append('red')
+                else:
+                    colors.append('white')
 
-            colors = ['yellow' if v > 12.0 else 'red' if v < 4.0 else 'white' for v in values]
-
-            sc.set_offsets(list(zip(mdates.date2num(time_objects), values)))
+            sc.set_offsets(list(zip(mdates.date2num(time_objects + predicted_times_objects), values)))
             sc.set_color(colors)
 
             ax.set_xlim([time_objects[-1] - timedelta(hours=3), time_objects[-1] + timedelta(minutes=10)])

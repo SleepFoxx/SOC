@@ -16,6 +16,7 @@ def scrape():
         raw_data = response.text
         time_values = []
         sgv_values = []
+        arrow_values = []
         
         lines = raw_data.strip().split('\n')
         
@@ -25,6 +26,26 @@ def scrape():
             if len(parts) >= 4:  
                 datetime_str = parts[0].strip('"')
                 sgv_value = parts[2]
+                arrow_value = parts[3].strip('"')
+
+                match arrow_value:
+                    case "Flat":
+                        arrow_value = "→"
+                    case "FortyFiveUp":
+                        arrow_value = "↗"
+                    case "SingleUp":
+                        arrow_value = "↑"
+                    case "DoubleUp":
+                        arrow_value = "↑"
+                    case "FortyFiveDown":
+                        arrow_value = "↘"
+                    case "SingleDown":
+                        arrow_value = "↓"
+                    case "DoubleDown":
+                        arrow_value = "↓"
+                    case _:
+                        arrow_value = "→"
+                
                 
                 datetime_obj = datetime.strptime(datetime_str, "%Y-%m-%dT%H:%M:%S.%fZ")
                 datetime_obj += timedelta(hours=1)
@@ -33,10 +54,10 @@ def scrape():
                 
                 time_values.append(time_part)
                 sgv_values.append(sgv_mmol)
+                arrow_values.append(arrow_value)
         
-        return time_values, sgv_values
+        return time_values, sgv_values, arrow_values
 
     else:
         print(f"Request failed with status code {response.status_code}")
         print("Response text:", response.text)
-scrape()
