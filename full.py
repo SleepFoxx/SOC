@@ -22,6 +22,7 @@ dexcom = Dexcom(username=username, password=password, region="ous")
 
 app = ctk.CTk()
 app.title("PyDexcom")
+app.attributes("-fullscreen", True)
 app.geometry("800x480")
 app.configure(bg="#000000")
 
