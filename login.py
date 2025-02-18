@@ -100,6 +100,7 @@ def login():
 
 init_db()
 generate_key()
+os.environ["DISPLAY"] = ":0"
 
 app = ctk.CTk()
 app.title("Login")
