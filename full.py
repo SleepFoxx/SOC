@@ -91,14 +91,14 @@ def update_glucose(on_clicking=False, first = False):
         glucose_reading = dexcom.get_current_glucose_reading()
         glucose_value = round(glucose_reading.mmol_l, 1)
 
-        if glucose_value > 12.0:
+        if glucose_value >= 12.0:
             glucose_label.configure(text_color="yellow")
             image_label.configure(text_color="yellow")
             if not mute_until or datetime.now() > mute_until:
                 pygame.mixer.init()
                 pygame.mixer.music.load("sources/sounds/high_alert.mp3")
                 show_mute_button()
-        elif glucose_value < 4.0:
+        elif glucose_value <= 4.0:
             glucose_label.configure(text_color="red")
             image_label.configure(text_color="red")
             if not mute_until or datetime.now() > mute_until:
