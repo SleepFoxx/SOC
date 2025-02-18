@@ -237,6 +237,20 @@ power_photo = ImageTk.PhotoImage(power_icon)
 power_button = ctk.CTkButton(master=app, text = "", image=power_photo, command=shutdown_system, fg_color="black", hover_color="black", border_width=0, corner_radius=0, width=40, height=40)
 power_button.place(x=700, y=10)
 
+def minimize_window():
+    if(app.attributes("-fullscreen")):
+        app.attributes("-fullscreen", False)
+    else:
+        app.attributes("-fullscreen", True)
+
+minimize_icon = Image.open("sources/images/minimize.png")
+minimize_icon = minimize_icon.resize((40, 40))
+minimize_photo = ImageTk.PhotoImage(minimize_icon)
+
+minimize_button = ctk.CTkButton(master=app, text = "", image=minimize_photo, command=minimize_window, fg_color="black", hover_color="black", border_width=0, corner_radius=0, width=40, height=40)
+minimize_button.place(x=10, y=10)
+minimize_button.lift()
+
 def on_closing():
     app.quit()  
     app.destroy()  
