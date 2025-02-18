@@ -168,9 +168,6 @@ def update_glucose(on_clicking=False, first = False):
             if len(times) > 36:
                 times.pop(0)
                 values.pop(0)
-            print(values)
-            print(times)
-            
             """
             
             for i in range(len(values)):
