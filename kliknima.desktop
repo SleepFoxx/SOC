@@ -2,7 +2,7 @@
 Version=1.0
 Type=Application
 Name=Spustiť Login
-Exec=lxterminal -e "bash -c 'cd /home/pi/Desktop/SOC/SOC && source venv/bin/activate && python login.py'"
+Exec=lxterminal -e "bash -c 'cd /home/admin/Desktop/SOC/SOC && source venv/bin/activate && python login.py; exec bash'"
 Icon=utilities-terminal
 Terminal=false
 Categories=Application;
