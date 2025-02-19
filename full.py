@@ -248,7 +248,7 @@ minimize_icon = minimize_icon.resize((40, 40))
 minimize_photo = ImageTk.PhotoImage(minimize_icon)
 
 minimize_button = ctk.CTkButton(master=app, text = "", image=minimize_photo, command=minimize_window, fg_color="black", hover_color="black", border_width=0, corner_radius=0, width=40, height=40)
-minimize_button.place(x=10, y=10)
+minimize_button.place(x=10, y=50)
 minimize_button.lift()
 
 def on_closing():
