@@ -48,7 +48,7 @@ def scrape():
                 
                 
                 datetime_obj = datetime.strptime(datetime_str, "%Y-%m-%dT%H:%M:%S.%fZ")
-                datetime_obj += timedelta(hours=1)
+                datetime_obj += timedelta(hours=2)
                 time_part = datetime_obj.strftime('%H:%M')
                 sgv_mmol = round(int(sgv_value) * 0.05551, 1)
                 

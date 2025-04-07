@@ -19,8 +19,6 @@ def generate_predictions(steps=5):
     times, values, arrows = scrape()
 
     def predict(values, arrows, steps):
-        values = values[::-1]
-        arrows = arrows[::-1]
         multipliers = np.array([arrows_to_multiplier(arrow) for arrow in arrows])
         differences = np.diff(values)
         arrow_effects = differences * multipliers[:-1]
@@ -39,23 +37,10 @@ def generate_predictions(steps=5):
             predicted_times.append(formated_time)
             last_value = next_value
         
-        return predictions
-
-    def predict_with_downward_trend(values, steps):
-        values = values[::-1]
-        last_value = values[-1]
-        avg_downward_effect = -np.abs(np.mean(np.diff(values)))
-
-        predictions = []
-
-        for _ in range(steps):
-            next_value = last_value + avg_downward_effect
-            predictions.append(next_value.round(1))
-            last_value = next_value
-        
-        return predictions
+        float_predictions = [float(pred) for pred in predictions]
+        return float_predictions
 
     predictions = predict(values, arrows, steps)
-    predictions_downward = predict_with_downward_trend(values, steps)
     
-    return predictions, predictions_downward, predicted_times
+    return predictions, predicted_times
+print(generate_predictions(5))

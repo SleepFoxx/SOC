@@ -7,7 +7,7 @@ from pydexcom import Dexcom
 import sys
 from PIL import Image, ImageTk
 from scraper import *
-#from prediction import generate_predictions
+from prediction import generate_predictions
 import pygame
 import os
 from collections import deque
@@ -148,31 +148,25 @@ def update_glucose(on_clicking=False, first = False):
             current_time = datetime.now()
             formated_time = current_time.strftime('%H:%M')  
             times.append(formated_time)
-            time_objects = [datetime.strptime(t, '%H:%M') for t in times]
-            """
-            if(first == False):
-                for i in range (27, 37):
-                    times.pop(i)
-                    values.pop(i)
             
-            predictions, predictions_downward, predicted_times = generate_predictions(5)
-
-            predicted_times_objects = [datetime.strptime(t, '%H:%M') for t in predicted_times]
             
+            predictions, predicted_times = generate_predictions(5) 
+            #predicted_times = [datetime.strptime(t, '%H:%M') for t in predicted_times]
+            #for i in range(len(predicted_times)):
+                #time_objects.append(predicted_times[i])
+                           
 
             for i in range(len(predictions)):
                 values.append( predictions[i])
-                values.append( predictions_downward[i])
                 times.append(predicted_times[i])
-                times.append(predicted_times[i])
-            """
-            if len(times) > 36:
+            
+            if len(times) > 36 + 5:
                 times.pop(0)
                 values.pop(0)
-            """
-            
+            time_objects = [datetime.strptime(t, '%H:%M') for t in times]
+            colors = []
             for i in range(len(values)):
-                if i >= len(values) - 2 * len(predicted_times):
+                if i >= len(values) - 1 * len(predicted_times):
                     colors.append('blue')
                 elif values[i] > 12.0:
                     colors.append('yellow')
@@ -180,14 +174,15 @@ def update_glucose(on_clicking=False, first = False):
                     colors.append('red')
                 else:
                     colors.append('white')
-            """
-            colors = ['yellow' if v > 12.0 else 'red' if v < 4.0 else 'white' for v in values]
+            
+            #colors = ['yellow' if v > 12.0 else 'red' if v < 4.0 else 'white' for v in values]
 
             sc.set_offsets(list(zip(mdates.date2num(time_objects), values)))
             sc.set_color(colors)
 
             ax.set_xlim([time_objects[-1] - timedelta(hours=3), time_objects[-1] + timedelta(minutes=10)])
             fig.canvas.draw_idle()
+            print(values, times)
     except Exception as e:
         glucose_label.configure(text="Chyba")
         arrow_label.configure(text=str(e))
@@ -258,8 +253,6 @@ app.protocol("WM_DELETE_WINDOW", on_closing)
 
 fig.canvas.mpl_connect('pick_event', on_pick)
 
-info_label = ctk.CTkLabel(master=app, text="Kliknite na bod na grafe", font=("Comic-sans", 15), fg_color="#000000", text_color="white")
-info_label.pack()
 
 update_glucose(first = True)
 
