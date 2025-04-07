@@ -160,7 +160,7 @@ def update_glucose(on_clicking=False, first = False):
                 values.append( predictions[i])
                 times.append(predicted_times[i])
             
-            if len(times) > 36 + 5:
+            if len(times) > 36 + 6:
                 times.pop(0)
                 values.pop(0)
             time_objects = [datetime.strptime(t, '%H:%M') for t in times]

@@ -10,7 +10,7 @@ def arrows_to_multiplier(arrows):
     else:
         return 0.0
 
-def generate_predictions(steps=5):
+def generate_predictions(steps=6):
     times = []
     values = []
     arrows = []
